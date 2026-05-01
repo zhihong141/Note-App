@@ -243,28 +243,44 @@ textarea{flex:1;border:none;font-size:14px;outline:none;resize:none;line-height:
 </div>
 <div class="modalOverlay" id="syncModal">
   <div class="modal">
-    <div class="modalTitle">Sync between devices</div>
-    <div class="modalDesc">Export your notes as a code, then paste it on any other device to import. No account needed.</div>
+    <div class="modalTitle">Sync / Export</div>
+    <div class="modalDesc">Download your notes as a file and import it on any other device.</div>
 
     <div>
-      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px">📤 Your export code</div>
-      <textarea class="syncCode" id="exportCode" readonly placeholder="Click Generate to create your code…"></textarea>
-      <div class="modalBtns" style="margin-top:8px">
-        <button class="modalBtn" id="genCodeBtn">Generate code</button>
-        <button class="modalBtn primary" id="copyCodeBtn">Copy code</button>
+      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📤 Export</div>
+      <div class="modalBtns">
+        <button class="modalBtn primary" id="exportFileBtn">Download .json file</button>
       </div>
     </div>
 
     <hr class="modalDivider">
 
-    <div class="importArea">
-      <div style="font-size:12px;font-weight:500;color:var(--text2)">📥 Import from code</div>
-      <textarea class="syncCode" id="importCode" placeholder="Paste your export code here…"></textarea>
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📥 Import</div>
+      <input type="file" id="importFileInput" accept=".json" style="display:none">
       <div class="modalBtns">
-        <button class="modalBtn danger" id="importReplaceBtn">Replace all notes</button>
-        <button class="modalBtn" id="importMergeBtn">Merge with existing</button>
+        <button class="modalBtn danger" id="importFileReplaceBtn">Replace from file</button>
+        <button class="modalBtn" id="importFileMergeBtn">Merge from file</button>
       </div>
     </div>
+
+    <hr class="modalDivider">
+
+    <details style="font-size:12px;color:var(--text3);cursor:pointer">
+      <summary style="user-select:none;padding:2px 0">Use code instead (for small note sets)</summary>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <textarea class="syncCode" id="exportCode" readonly placeholder="Click Generate to create your code..."></textarea>
+        <div class="modalBtns">
+          <button class="modalBtn" id="genCodeBtn">Generate code</button>
+          <button class="modalBtn" id="copyCodeBtn">Copy code</button>
+        </div>
+        <textarea class="syncCode" id="importCode" placeholder="Paste export code here..."></textarea>
+        <div class="modalBtns">
+          <button class="modalBtn danger" id="importReplaceBtn">Replace from code</button>
+          <button class="modalBtn" id="importMergeBtn">Merge from code</button>
+        </div>
+      </div>
+    </details>
 
     <button class="modalBtn" id="closeModalBtn" style="margin-top:4px">Close</button>
   </div>
@@ -525,7 +541,7 @@ function createNote(n){
       const p=await dlgPrompt("Set a password for this note","Password","password");
       if(p){n.locked=true;n.password=p;n.revealed=false;}
     } else {
-      const p=await dlgPrompt("Enter password to unlock","Password","password");
+      const p=await dlgPrompt("Enter password to lock","Password","password");
       if(p===null) return;
       if(p===n.password){n.revealed=!n.revealed;}
       else await dlgAlert("Wrong password","The password you entered is incorrect.");
@@ -679,6 +695,62 @@ $("syncBtn").onclick = () => { syncModal.classList.add("show"); exportCode.value
 $("closeModalBtn").onclick = () => syncModal.classList.remove("show");
 syncModal.addEventListener("click", e => { if(e.target===syncModal) syncModal.classList.remove("show"); });
 
+// ── File export ───────────────────────────────────────────────────────────────
+$("exportFileBtn").onclick = () => {
+  const payload = { notes, folders, dark, sortMode, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `notes-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showSyncToast(`✓ Downloaded ${notes.length} notes`);
+};
+
+// ── File import ───────────────────────────────────────────────────────────────
+function pickFile(){ return new Promise(res => {
+  const inp = $("importFileInput");
+  inp.value = "";
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return res(null);
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { res(JSON.parse(ev.target.result)); }
+      catch(e) { res(null); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+});}
+
+$("importFileReplaceBtn").onclick = async () => {
+  const data = await pickFile();
+  if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
+  const ok = await dlgConfirm("Replace all notes?", `Replace all your notes with ${data.notes.length} imported notes? This cannot be undone.`);
+  if(!ok) return;
+  notes = data.notes; folders = data.folders||["General"];
+  notes.forEach(migrate);
+  save(); renderFolders(); render();
+  syncModal.classList.remove("show");
+  showSyncToast(`✓ Imported ${notes.length} notes`);
+};
+
+$("importFileMergeBtn").onclick = async () => {
+  const data = await pickFile();
+  if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
+  const existing = new Set(notes.map(n=>n.created));
+  const newNotes = data.notes.filter(n=>!existing.has(n.created));
+  data.folders?.forEach(f=>{ if(!folders.includes(f)) folders.push(f); });
+  notes = [...newNotes, ...notes];
+  notes.forEach(migrate);
+  save(); renderFolders(); render();
+  syncModal.classList.remove("show");
+  showSyncToast(`✓ Merged ${newNotes.length} new notes`);
+};
+
+// ── Code export/import (fallback for small sets) ──────────────────────────────
 $("genCodeBtn").onclick = () => {
   const payload = { notes, folders, dark, sortMode, exported: Date.now() };
   const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));

@@ -1,0 +1,38 @@
+{
+  "name": "notes-app",
+  "version": "1.0.0",
+  "description": "Minimal notes app with Google Drive sync",
+  "author": "notes-app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.notes.app",
+    "productName": "Notes",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "Notes-portable.exe"
+    }
+  }
+}

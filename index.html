@@ -538,12 +538,17 @@ function createNote(n){
   const arch=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="4"/><path d="M5 8v11h14V8"/></svg>',()=>{n.archived=!n.archived;if(n.archived){lastArchived=n;showToast();}save();render();});
   const lock=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 118 0v4"/></svg>',async()=>{
     if(!n.locked){
-      const p=await dlgPrompt("Set a password for this note","Password","password");
-      if(p){n.locked=true;n.password=p;n.revealed=false;}
+      // Not locked yet — set a password
+      const p=await dlgPrompt("Set a password","Choose a password to lock this note","password");
+      if(p&&p.trim()){n.locked=true;n.password=p;n.revealed=false;}
+    } else if(n.revealed){
+      // Unlocked and visible — re-lock without asking password
+      n.revealed=false;
     } else {
-      const p=await dlgPrompt("Enter password to lock","Password","password");
+      // Locked and hidden — ask password to unlock
+      const p=await dlgPrompt("Enter password to unlock","Password","password");
       if(p===null) return;
-      if(p===n.password){n.revealed=!n.revealed;}
+      if(p===n.password){n.revealed=true;}
       else await dlgAlert("Wrong password","The password you entered is incorrect.");
     }
     save();render();

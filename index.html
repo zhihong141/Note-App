@@ -5,292 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f6f6f6;--surface:#fff;--border:#eaeaea;--border2:#e5e5e5;
-  --text:#111;--text2:#333;--text3:#777;
-  --shadow:rgba(0,0,0,.04);--shadow2:rgba(0,0,0,.08);--pinBorder:#111;
-}
-body.dark{
-  --bg:#1a1a1a;--surface:#252525;--border:#333;--border2:#3a3a3a;
-  --text:#f0f0f0;--text2:#ccc;--text3:#888;
-  --shadow:rgba(0,0,0,.3);--shadow2:rgba(0,0,0,.4);--pinBorder:#eee;
-}
-body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .2s,color .2s;min-height:100vh}
-.layout{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;gap:6px;transition:background .2s,border .2s}
-.sideTitle{font-family:"Plus Jakarta Sans";font-size:20px;font-weight:600;padding:4px 8px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.sideSection{font-size:10px;letter-spacing:1.5px;color:var(--text3);padding:12px 8px 4px;text-transform:uppercase;font-weight:500}
-.folderItem{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s;user-select:none}
-.folderItem:hover{background:var(--border)}
-.folderItem.active{background:var(--text);color:var(--bg)}
-.folderItem svg{flex-shrink:0;opacity:.6}
-.folderItem.active svg{opacity:1}
-.folderCount{margin-left:auto;font-size:11px;opacity:.5}
-.addFolderBtn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text3);transition:.15s;border:none;background:transparent;width:100%;text-align:left}
-.addFolderBtn:hover{background:var(--border);color:var(--text)}
-.sideBottom{margin-top:auto;display:flex;flex-direction:column;gap:6px}
-.sideIconBtn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text3);border:none;background:transparent;width:100%;text-align:left;transition:.15s}
-.sideIconBtn:hover{background:var(--border);color:var(--text)}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;transition:background .2s,border .2s;position:sticky;top:0;z-index:10}
-.topbarTitle{font-family:"Plus Jakarta Sans";font-size:18px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.searchWrap{position:relative;display:flex;align-items:center}
-.searchWrap svg{position:absolute;left:10px;pointer-events:none;color:var(--text3)}
-.searchInput{border:1px solid var(--border2);padding:7px 12px 7px 32px;border-radius:11px;background:var(--surface);color:var(--text);font-size:13px;outline:none;width:180px;transition:width .2s}
-.searchInput:focus{width:220px}
-.sortSel{border:1px solid var(--border2);background:var(--surface);color:var(--text);padding:6px 10px;border-radius:10px;font-size:12px;outline:none;cursor:pointer}
-.iconBtn{border:1px solid var(--border2);background:var(--surface);color:var(--text);width:32px;height:32px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
-.iconBtn:hover{background:var(--border)}
-.syncDot{width:7px;height:7px;border-radius:50%;background:#69db7c;flex-shrink:0;transition:background .3s}
-.syncDot.syncing{background:#ffd43b;animation:pulse 1s infinite}
-.syncDot.error{background:#ff6b6b}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.content{flex:1;overflow-y:auto;padding:20px}
-.notesGrid{display:flex;flex-direction:column;gap:10px}
-.sectionLabel{font-size:10px;letter-spacing:1.6px;color:var(--text3);margin:14px 0 6px;font-weight:500;text-transform:uppercase}
-.archivedGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
-.archivedCard{height:88px;border-radius:14px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);cursor:pointer;transition:.2s;text-align:center;padding:8px}
-.archivedCard:hover{transform:scale(1.04);box-shadow:0 4px 14px var(--shadow2)}
-.note{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px 10px;box-shadow:0 2px 8px var(--shadow);display:flex;flex-direction:column;gap:5px;transition:background .2s,border-color .2s,box-shadow .2s}
-.note:hover{box-shadow:0 4px 16px var(--shadow2)}
-.note.pinned{border-color:var(--pinBorder)}
-.note.dragging{opacity:.4}
-.placeholder{height:60px;border:2px dashed var(--border);border-radius:12px}
-.noteTopRow{display:flex;align-items:center;gap:4px}
-.dragHandle{cursor:grab;color:var(--text3);flex-shrink:0;display:flex;align-items:center;padding:2px}
-.noteActions{display:flex;gap:3px;margin-left:auto;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.noteTitleRow{display:flex;align-items:center;gap:6px;min-width:0;padding:1px 2px}
-.colorDot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.noteTitle{font-family:"Plus Jakarta Sans";font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
-.notePreview{font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.5;word-break:break-word;padding:0 4px}
-.noteFull{display:none;font-size:13px;color:var(--text2);line-height:1.55;padding:0 4px;white-space:pre-wrap}
-.note.expanded .noteFull{display:block}
-.note.expanded .notePreview{display:none}
-.noteMeta{font-size:10px;color:var(--text);opacity:.45;padding:0 4px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:2px}
-.noteFolder{font-size:10px;background:var(--border);padding:1px 6px;border-radius:20px;color:var(--text3)}
-.noteColorBar{height:3px;border-radius:0 0 12px 12px;margin:4px -12px -10px}
-.checklist{display:flex;flex-direction:column;gap:5px;padding:0 4px}
-.checkItem{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--text2);line-height:1.4}
-.checkItem input[type=checkbox]{margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--text)}
-.checkItem span{flex:1;word-break:break-word}
-.checkItem span.done{text-decoration:line-through;opacity:.4}
-.addCLItem{display:flex;gap:5px;margin-top:3px}
-.addCLItem input{flex:1;border:none;border-bottom:1px solid var(--border2);background:transparent;color:var(--text);font-size:12px;padding:3px 2px;outline:none}
-.addCLItem button{border:none;background:transparent;color:var(--text3);font-size:17px;cursor:pointer}
-.nbtn{border:1px solid var(--border);width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
-.nbtn:hover{background:var(--border)}
-.floatingInput{position:fixed;bottom:18px;left:220px;right:0;margin:0 auto;width:calc(100% - 260px);max-width:720px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:12px;box-shadow:0 8px 28px var(--shadow2);transition:background .2s;z-index:20}
-.inputTopRow{display:flex;gap:8px;margin-bottom:6px;align-items:center}
-.subjectInput{border:none;font-family:"Plus Jakarta Sans";font-weight:600;font-size:14px;outline:none;flex:1;background:transparent;color:var(--text)}
-.inputModeBtn{border:1px solid var(--border2);background:var(--surface);color:var(--text3);font-size:11px;padding:4px 8px;border-radius:7px;cursor:pointer;white-space:nowrap}
-.inputModeBtn.on{background:var(--text);color:var(--bg);border-color:var(--text)}
-.inputRow{display:flex;gap:8px}
-textarea{flex:1;border:none;font-size:14px;outline:none;resize:none;line-height:1.55;background:transparent;color:var(--text);font-family:inherit}
-.addBtn{border:none;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:500;font-size:13px;white-space:nowrap}
-.clInput{display:flex;flex-direction:column;gap:5px;flex:1}
-.clRow{display:flex;gap:5px;align-items:center}
-.clRow input[type=text]{flex:1;border:none;border-bottom:1px solid var(--border2);background:transparent;color:var(--text);font-size:13px;padding:3px 2px;outline:none;font-family:inherit}
-.rmBtn{border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:16px;padding:0 3px}
-.addClBtn{border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;text-align:left;padding:3px 2px}
-.colorPicker{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:158px;box-shadow:0 8px 24px var(--shadow2)}
-.colorSwatch{width:24px;height:24px;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:.15s}
-.colorSwatch:hover{transform:scale(1.15)}
-.colorSwatch.sel{border-color:var(--text)}
-.folderPicker{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:5px;box-shadow:0 8px 24px var(--shadow2);min-width:140px}
-.folderOption{padding:6px 11px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--text)}
-.folderOption:hover{background:var(--border)}
-.bd{position:fixed;inset:0;z-index:299}
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:400;white-space:nowrap;pointer-events:none}
-#toast.show{opacity:1;pointer-events:auto}
-.syncBanner{display:none;align-items:center;gap:8px;padding:8px 16px;background:#ffd43b22;border-bottom:1px solid #ffd43b44;font-size:12px;color:var(--text2);flex-shrink:0}
-.syncBanner.show{display:flex}
-.hamburger{display:none;border:1px solid var(--border2);background:var(--surface);color:var(--text);width:32px;height:32px;border-radius:9px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
-.sideOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50}
-.emptyState{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;opacity:.35;gap:10px;text-align:center}
-.emptyState p{font-size:14px;color:var(--text3)}
-.modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
-.modalOverlay.show{display:flex}
-.modal{background:var(--surface);border-radius:18px;padding:24px;width:90%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:16px}
-.modalTitle{font-family:"Plus Jakarta Sans";font-size:17px;font-weight:600;color:var(--text)}
-.modalDesc{font-size:13px;color:var(--text3);line-height:1.5}
-.syncCode{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:11px;font-family:monospace;color:var(--text2);resize:none;height:90px;outline:none;word-break:break-all}
-.modalBtns{display:flex;gap:8px;flex-wrap:wrap}
-.modalBtn{flex:1;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);transition:.15s;white-space:nowrap}
-.modalBtn:hover{background:var(--border)}
-.modalBtn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
-.modalBtn.primary:hover{opacity:.85}
-.modalBtn.danger{border-color:#ff6b6b;color:#ff6b6b}
-.modalBtn.danger:hover{background:#ff6b6b22}
-.modalDivider{border:none;border-top:1px solid var(--border);margin:0}
-.importArea{display:flex;flex-direction:column;gap:8px}
-/* Custom dialog */
-.dialogOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center}
-.dialogOverlay.show{display:flex}
-.dialog{background:var(--surface);border-radius:16px;padding:22px;width:88%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px}
-.dialogTitle{font-family:"Plus Jakarta Sans";font-size:15px;font-weight:600;color:var(--text)}
-.dialogMsg{font-size:13px;color:var(--text2);line-height:1.5}
-.dialogInput{border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--bg);color:var(--text);outline:none;width:100%}
-.dialogInput:focus{border-color:var(--text)}
-.dialogBtns{display:flex;gap:8px;justify-content:flex-end}
-.dialogBtn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);transition:.15s}
-.dialogBtn:hover{background:var(--border)}
-.dialogBtn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
-.dialogBtn.danger{border-color:#ff6b6b;color:#ff6b6b}
-.dialogBtn.danger:hover{background:#ff6b6b22}
-/* Mobile folder tabs */
-.mobileFolderBar{display:none;overflow-x:auto;padding:8px 14px;gap:6px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.mobileFolderBar::-webkit-scrollbar{display:none}
-.mobileFolderTab{padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.15s}
-.mobileFolderTab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-@media(max-width:640px){
-  .sidebar{position:fixed;left:-220px;top:0;bottom:0;z-index:60;transition:left .25s}
-  .sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.15)}
-  .sideOverlay.show{display:block}
-  .hamburger{display:flex}
-  .floatingInput{left:0;width:calc(100% - 24px);bottom:12px}
-  .mobileFolderBar{display:flex}
-  .topbar{flex-wrap:wrap;padding:10px 14px;gap:8px}
-  .topbarTitle{display:none}
-  .searchInput{width:100% !important}
-  .searchWrap{flex:1}
-}
-</style>
+<style>*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f6f6;--surface:#fff;--border:#eaeaea;--border2:#e5e5e5;--text:#111;--text2:#333;--text3:#777;--shadow:rgba(0,0,0,.04);--shadow2:rgba(0,0,0,.08);--pinBorder:#111}body.dark{--bg:#1a1a1a;--surface:#252525;--border:#333;--border2:#3a3a3a;--text:#f0f0f0;--text2:#ccc;--text3:#888;--shadow:rgba(0,0,0,.3);--shadow2:rgba(0,0,0,.4);--pinBorder:#eee}body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .2s,color .2s;min-height:100vh}.layout{display:flex;height:100vh;overflow:hidden}.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;gap:6px;transition:background .2s,border .2s}.sideTitle{font-family:"Plus Jakarta Sans";font-size:20px;font-weight:600;padding:4px 8px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}.sideSection{font-size:10px;letter-spacing:1.5px;color:var(--text3);padding:12px 8px 4px;text-transform:uppercase;font-weight:500}.folderItem{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s;user-select:none}.folderItem:hover{background:var(--border)}.folderItem.active{background:var(--text);color:var(--bg)}.folderItem svg{flex-shrink:0;opacity:.6}.folderItem.active svg{opacity:1}.folderCount{margin-left:auto;font-size:11px;opacity:.5}.addFolderBtn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text3);transition:.15s;border:none;background:transparent;width:100%;text-align:left}.addFolderBtn:hover{background:var(--border);color:var(--text)}.sideBottom{margin-top:auto;display:flex;flex-direction:column;gap:6px}.sideIconBtn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text3);border:none;background:transparent;width:100%;text-align:left;transition:.15s}.sideIconBtn:hover{background:var(--border);color:var(--text)}.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}.topbar{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;transition:background .2s,border .2s;position:sticky;top:0;z-index:10}.topbarTitle{font-family:"Plus Jakarta Sans";font-size:18px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.searchWrap{position:relative;display:flex;align-items:center}.searchWrap svg{position:absolute;left:10px;pointer-events:none;color:var(--text3)}.searchInput{border:1px solid var(--border2);padding:7px 12px 7px 32px;border-radius:11px;background:var(--surface);color:var(--text);font-size:13px;outline:none;width:180px;transition:width .2s}.searchInput:focus{width:220px}.sortSel{border:1px solid var(--border2);background:var(--surface);color:var(--text);padding:6px 10px;border-radius:10px;font-size:12px;outline:none;cursor:pointer}.iconBtn{border:1px solid var(--border2);background:var(--surface);color:var(--text);width:32px;height:32px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}.iconBtn:hover{background:var(--border)}.syncDot{width:7px;height:7px;border-radius:50%;background:#69db7c;flex-shrink:0;transition:background .3s}.syncDot.syncing{background:#ffd43b;animation:pulse 1s infinite}.syncDot.error{background:#ff6b6b}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}.content{flex:1;overflow-y:auto;padding:20px}.notesGrid{display:flex;flex-direction:column;gap:10px}.sectionLabel{font-size:10px;letter-spacing:1.6px;color:var(--text3);margin:14px 0 6px;font-weight:500;text-transform:uppercase}.archivedGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}.archivedCard{height:88px;border-radius:14px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);cursor:pointer;transition:.2s;text-align:center;padding:8px}.archivedCard:hover{transform:scale(1.04);box-shadow:0 4px 14px var(--shadow2)}.note{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px 10px;box-shadow:0 2px 8px var(--shadow);display:flex;flex-direction:column;gap:5px;transition:background .2s,border-color .2s,box-shadow .2s}.note:hover{box-shadow:0 4px 16px var(--shadow2)}.note.pinned{border-color:var(--pinBorder)}.note.dragging{opacity:.4}.placeholder{height:60px;border:2px dashed var(--border);border-radius:12px}.noteTopRow{display:flex;align-items:center;gap:4px}.dragHandle{cursor:grab;color:var(--text3);flex-shrink:0;display:flex;align-items:center;padding:2px}.noteActions{display:flex;gap:3px;margin-left:auto;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}.noteTitleRow{display:flex;align-items:center;gap:6px;min-width:0;padding:1px 2px}.colorDot{width:9px;height:9px;border-radius:50%;flex-shrink:0}.noteTitle{font-family:"Plus Jakarta Sans";font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}.notePreview{font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.5;word-break:break-word;padding:0 4px}.noteFull{display:none;font-size:13px;color:var(--text2);line-height:1.55;padding:0 4px;white-space:pre-wrap}.note.expanded .noteFull{display:block}.note.expanded .notePreview{display:none}.noteMeta{font-size:10px;color:var(--text);opacity:.45;padding:0 4px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:2px}.noteFolder{font-size:10px;background:var(--border);padding:1px 6px;border-radius:20px;color:var(--text3)}.noteColorBar{height:3px;border-radius:0 0 12px 12px;margin:4px -12px -10px}.checklist{display:flex;flex-direction:column;gap:5px;padding:0 4px}.checkItem{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--text2);line-height:1.4}.checkItem input[type=checkbox]{margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--text)}.checkItem span{flex:1;word-break:break-word}.checkItem span.done{text-decoration:line-through;opacity:.4}.addCLItem{display:flex;gap:5px;margin-top:3px}.addCLItem input{flex:1;border:none;border-bottom:1px solid var(--border2);background:transparent;color:var(--text);font-size:12px;padding:3px 2px;outline:none}.addCLItem button{border:none;background:transparent;color:var(--text3);font-size:17px;cursor:pointer}.nbtn{border:1px solid var(--border);width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}.nbtn:hover{background:var(--border)}.floatingInput{position:fixed;bottom:18px;left:220px;right:0;margin:0 auto;width:calc(100% - 260px);max-width:720px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:12px;box-shadow:0 8px 28px var(--shadow2);transition:background .2s;z-index:20}.inputTopRow{display:flex;gap:8px;margin-bottom:6px;align-items:center}.subjectInput{border:none;font-family:"Plus Jakarta Sans";font-weight:600;font-size:14px;outline:none;flex:1;background:transparent;color:var(--text)}.inputModeBtn{border:1px solid var(--border2);background:var(--surface);color:var(--text3);font-size:11px;padding:4px 8px;border-radius:7px;cursor:pointer;white-space:nowrap}.inputModeBtn.on{background:var(--text);color:var(--bg);border-color:var(--text)}.inputRow{display:flex;gap:8px}textarea{flex:1;border:none;font-size:14px;outline:none;resize:none;line-height:1.55;background:transparent;color:var(--text);font-family:inherit}.addBtn{border:none;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:500;font-size:13px;white-space:nowrap}.clInput{display:flex;flex-direction:column;gap:5px;flex:1}.clRow{display:flex;gap:5px;align-items:center}.clRow input[type=text]{flex:1;border:none;border-bottom:1px solid var(--border2);background:transparent;color:var(--text);font-size:13px;padding:3px 2px;outline:none;font-family:inherit}.rmBtn{border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:16px;padding:0 3px}.addClBtn{border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;text-align:left;padding:3px 2px}.colorPicker{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:158px;box-shadow:0 8px 24px var(--shadow2)}.colorSwatch{width:24px;height:24px;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:.15s}.colorSwatch:hover{transform:scale(1.15)}.colorSwatch.sel{border-color:var(--text)}.folderPicker{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:5px;box-shadow:0 8px 24px var(--shadow2);min-width:140px}.folderOption{padding:6px 11px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--text)}.folderOption:hover{background:var(--border)}.bd{position:fixed;inset:0;z-index:299}#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:400;white-space:nowrap;pointer-events:none}#toast.show{opacity:1;pointer-events:auto}.syncBanner{display:none;align-items:center;gap:8px;padding:8px 16px;background:#ffd43b22;border-bottom:1px solid #ffd43b44;font-size:12px;color:var(--text2);flex-shrink:0}.syncBanner.show{display:flex}.hamburger{display:none;border:1px solid var(--border2);background:var(--surface);color:var(--text);width:32px;height:32px;border-radius:9px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}.sideOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50}.emptyState{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;opacity:.35;gap:10px;text-align:center}.emptyState p{font-size:14px;color:var(--text3)}.modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}.modalOverlay.show{display:flex}.modal{background:var(--surface);border-radius:18px;padding:24px;width:90%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:16px}.modalTitle{font-family:"Plus Jakarta Sans";font-size:17px;font-weight:600;color:var(--text)}.modalDesc{font-size:13px;color:var(--text3);line-height:1.5}.syncCode{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:11px;font-family:monospace;color:var(--text2);resize:none;height:90px;outline:none;word-break:break-all}.modalBtns{display:flex;gap:8px;flex-wrap:wrap}.modalBtn{flex:1;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);transition:.15s;white-space:nowrap}.modalBtn:hover{background:var(--border)}.modalBtn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}.modalBtn.primary:hover{opacity:.85}.modalBtn.danger{border-color:#ff6b6b;color:#ff6b6b}.modalBtn.danger:hover{background:#ff6b6b22}.modalDivider{border:none;border-top:1px solid var(--border);margin:0}.importArea{display:flex;flex-direction:column;gap:8px}.dialogOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center}.dialogOverlay.show{display:flex}.dialog{background:var(--surface);border-radius:16px;padding:22px;width:88%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px}.dialogTitle{font-family:"Plus Jakarta Sans";font-size:15px;font-weight:600;color:var(--text)}.dialogMsg{font-size:13px;color:var(--text2);line-height:1.5}.dialogInput{border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--bg);color:var(--text);outline:none;width:100%}.dialogInput:focus{border-color:var(--text)}.dialogBtns{display:flex;gap:8px;justify-content:flex-end}.dialogBtn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);transition:.15s}.dialogBtn:hover{background:var(--border)}.dialogBtn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}.dialogBtn.danger{border-color:#ff6b6b;color:#ff6b6b}.dialogBtn.danger:hover{background:#ff6b6b22}.mobileFolderBar{display:none;overflow-x:auto;padding:8px 14px;gap:6px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}.mobileFolderBar::-webkit-scrollbar{display:none}.mobileFolderTab{padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.15s}.mobileFolderTab.active{background:var(--text);color:var(--bg);border-color:var(--text)}@media(max-width:640px){.sidebar{position:fixed;left:-220px;top:0;bottom:0;z-index:60;transition:left .25s}.sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.15)}.sideOverlay.show{display:block}.hamburger{display:flex}.floatingInput{left:0;width:calc(100% - 24px);bottom:12px}.mobileFolderBar{display:flex}.topbar{flex-wrap:wrap;padding:10px 14px;gap:8px}.topbarTitle{display:none}.searchInput{width:100% !important}.searchWrap{flex:1}}</style>
 </head>
 <body>
-<div class="layout">
-  <div class="sidebar" id="sidebar">
-    <div class="sideTitle">
+<div class="layout"><div class="sidebar" id="sidebar"><div class="sideTitle">
       Notes
-      <div class="syncDot" id="syncDot" title="Sync status"></div>
-    </div>
-    <div class="sideSection">Folders</div>
-    <div id="folderList"></div>
-    <button class="addFolderBtn" id="addFolderBtn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <div class="syncDot" id="syncDot" title="Sync status"></div></div><div class="sideSection">Folders</div><div id="folderList"></div><button class="addFolderBtn" id="addFolderBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       New folder
-    </button>
-    <div class="sideBottom">
-      <button class="sideIconBtn" id="darkBtn">
-        <span id="darkIcon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></span>
-        <span id="darkLabel">Dark mode</span>
-      </button>
-      <button class="sideIconBtn" id="syncBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+    </button><div class="sideBottom"><button class="sideIconBtn" id="darkBtn"><span id="darkIcon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></span><span id="darkLabel">Dark mode</span></button><button class="sideIconBtn" id="syncBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
         Sync / Export
-      </button>
-    </div>
-  </div>
-  <div class="sideOverlay" id="sideOverlay"></div>
-  <div class="main">
-    <div class="syncBanner" id="syncBanner">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+      </button></div></div><div class="sideOverlay" id="sideOverlay"></div><div class="main"><div class="syncBanner" id="syncBanner"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
       Syncing…
-    </div>
-    <div class="topbar">
-      <button class="hamburger" id="hamburger">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <div class="topbarTitle" id="topbarTitle">All Notes</div>
-      <div class="searchWrap">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="searchInput" id="search" placeholder="Search...">
-      </div>
-      <select class="sortSel" id="sortSel">
-        <option value="manual">Manual</option>
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-        <option value="alpha">A–Z</option>
-      </select>
-    </div>
-    <div class="mobileFolderBar" id="mobileFolderBar"></div>
-    <div class="content" id="content">
-      <div class="sectionLabel" id="pinnedLabel" style="display:none">Pinned</div>
-      <div id="pinned" class="notesGrid"></div>
-      <div class="sectionLabel">Notes</div>
-      <div id="notes" class="notesGrid"></div>
-      <div class="sectionLabel">Archived</div>
-      <div id="archived" class="archivedGrid"></div>
-    </div>
-  </div>
+    </div><div class="topbar"><button class="hamburger" id="hamburger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><div class="topbarTitle" id="topbarTitle">All Notes</div><div class="searchWrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="searchInput" id="search" placeholder="Search..."></div><select class="sortSel" id="sortSel"><option value="manual">Manual</option><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A–Z</option></select></div><div class="mobileFolderBar" id="mobileFolderBar"></div><div class="content" id="content"><div class="sectionLabel" id="pinnedLabel" style="display:none">Pinned</div><div id="pinned" class="notesGrid"></div><div class="sectionLabel">Notes</div><div id="notes" class="notesGrid"></div><div class="sectionLabel">Archived</div><div id="archived" class="archivedGrid"></div></div></div>
 </div>
-<div class="floatingInput">
-  <div class="inputTopRow">
-    <input id="subject" class="subjectInput" placeholder="Title (optional)">
-    <button class="inputModeBtn" id="modeBtn">☑ Checklist</button>
-  </div>
-  <div class="inputRow" id="textRow">
-    <textarea id="input" placeholder="Write a note..." rows="2"></textarea>
-    <button class="addBtn" id="addBtn">Add</button>
-  </div>
-  <div id="checkRow" style="display:none;flex-direction:column;gap:7px">
-    <div class="clInput" id="clInputs"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <button class="addClBtn" id="addClItemBtn">+ Add item</button>
-      <button class="addBtn" id="addClNoteBtn">Add</button>
-    </div>
-  </div>
+<div class="floatingInput"><div class="inputTopRow"><input id="subject" class="subjectInput" placeholder="Title (optional)"><button class="inputModeBtn" id="modeBtn">☑ Checklist</button></div><div class="inputRow" id="textRow"><textarea id="input" placeholder="Write a note..." rows="2"></textarea><button class="addBtn" id="addBtn">Add</button></div><div id="checkRow" style="display:none;flex-direction:column;gap:7px"><div class="clInput" id="clInputs"></div><div style="display:flex;justify-content:space-between;align-items:center"><button class="addClBtn" id="addClItemBtn">+ Add item</button><button class="addBtn" id="addClNoteBtn">Add</button></div></div>
 </div>
 <div id="toast">Archived <span id="undo" style="text-decoration:underline;cursor:pointer;margin-left:6px;pointer-events:auto">Undo</span></div>
-<div class="dialogOverlay" id="dialogOverlay">
-  <div class="dialog">
-    <div class="dialogTitle" id="dialogTitle"></div>
-    <div class="dialogMsg" id="dialogMsg" style="display:none"></div>
-    <input class="dialogInput" id="dialogInput" style="display:none" type="text">
-    <div class="dialogBtns" id="dialogBtns"></div>
-  </div>
+<div class="dialogOverlay" id="dialogOverlay"><div class="dialog"><div class="dialogTitle" id="dialogTitle"></div><div class="dialogMsg" id="dialogMsg" style="display:none"></div><input class="dialogInput" id="dialogInput" style="display:none" type="text"><div class="dialogBtns" id="dialogBtns"></div></div>
 </div>
-<div class="modalOverlay" id="syncModal">
-  <div class="modal">
-    <div class="modalTitle">Sync / Export</div>
-    <div class="modalDesc">Download your notes as a file and import it on any other device.</div>
-
-    <div>
-      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📤 Export</div>
-      <div class="modalBtns">
-        <button class="modalBtn primary" id="exportFileBtn">Download .json file</button>
-      </div>
-    </div>
-
-    <hr class="modalDivider">
-
-    <div>
-      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📥 Import</div>
-      <input type="file" id="importFileInput" accept=".json" style="display:none">
-      <div class="modalBtns">
-        <button class="modalBtn danger" id="importFileReplaceBtn">Replace from file</button>
-        <button class="modalBtn" id="importFileMergeBtn">Merge from file</button>
-      </div>
-    </div>
-
-    <hr class="modalDivider">
-
-    <details style="font-size:12px;color:var(--text3);cursor:pointer">
-      <summary style="user-select:none;padding:2px 0">Use code instead (for small note sets)</summary>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-        <textarea class="syncCode" id="exportCode" readonly placeholder="Click Generate to create your code..."></textarea>
-        <div class="modalBtns">
-          <button class="modalBtn" id="genCodeBtn">Generate code</button>
-          <button class="modalBtn" id="copyCodeBtn">Copy code</button>
-        </div>
-        <textarea class="syncCode" id="importCode" placeholder="Paste export code here..."></textarea>
-        <div class="modalBtns">
-          <button class="modalBtn danger" id="importReplaceBtn">Replace from code</button>
-          <button class="modalBtn" id="importMergeBtn">Merge from code</button>
-        </div>
-      </div>
-    </details>
-
-    <button class="modalBtn" id="closeModalBtn" style="margin-top:4px">Close</button>
-  </div>
+<div class="modalOverlay" id="syncModal"><div class="modal"><div class="modalTitle">Sync / Export</div><div class="modalDesc">Download your notes as a file and import it on any other device.</div><div><div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📤 Export</div><div class="modalBtns"><button class="modalBtn primary" id="exportFileBtn">Download .json file</button></div></div><hr class="modalDivider"><div><div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">📥 Import</div><input type="file" id="importFileInput" accept=".json" style="display:none"><div class="modalBtns"><button class="modalBtn danger" id="importFileReplaceBtn">Replace from file</button><button class="modalBtn" id="importFileMergeBtn">Merge from file</button></div></div><hr class="modalDivider"><details style="font-size:12px;color:var(--text3);cursor:pointer"><summary style="user-select:none;padding:2px 0">Use code instead (for small note sets)</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:10px"><textarea class="syncCode" id="exportCode" readonly placeholder="Click Generate to create your code..."></textarea><div class="modalBtns"><button class="modalBtn" id="genCodeBtn">Generate code</button><button class="modalBtn" id="copyCodeBtn">Copy code</button></div><textarea class="syncCode" id="importCode" placeholder="Paste export code here..."></textarea><div class="modalBtns"><button class="modalBtn danger" id="importReplaceBtn">Replace from code</button><button class="modalBtn" id="importMergeBtn">Merge from code</button></div></div></details><button class="modalBtn" id="closeModalBtn" style="margin-top:4px">Close</button></div>
 </div>
-<script>
-const COLORS=[
-  {v:null,l:"None"},
-  {v:"#ff6b6b",l:"Red"},{v:"#ffa94d",l:"Orange"},{v:"#ffd43b",l:"Yellow"},
-  {v:"#69db7c",l:"Green"},{v:"#38d9a9",l:"Teal"},{v:"#74c0fc",l:"Blue"},
-  {v:"#b197fc",l:"Purple"},{v:"#f783ac",l:"Pink"}
+<script>const COLORS=[
+{v:null,l:"None"},
+{v:"#ff6b6b",l:"Red"},{v:"#ffa94d",l:"Orange"},{v:"#ffd43b",l:"Yellow"},
+{v:"#69db7c",l:"Green"},{v:"#38d9a9",l:"Teal"},{v:"#74c0fc",l:"Blue"},
+{v:"#b197fc",l:"Purple"},{v:"#f783ac",l:"Pink"}
 ];
 let notes=[],folders=["General"],activeFolder="All";
 let dark=false,sortMode="manual",clMode=false;
@@ -306,137 +45,138 @@ const clInputs=$("clInputs"),addClItemBtn=$("addClItemBtn"),addClNoteBtn=$("addC
 const syncDot=$("syncDot"),syncBanner=$("syncBanner");
 const sidebar=$("sidebar"),sideOverlay=$("sideOverlay"),hamburger=$("hamburger");
 
-// ── Storage (Electron file storage or localStorage fallback) ──────────────────
 const isElectron = typeof window.electronStorage !== 'undefined';
 
 async function loadFromStorage(){
-  try {
-    if(isElectron){
-      const raw = await window.electronStorage.get();
-      if(raw){
-        const d = JSON.parse(raw);
-        notes   = d.notes   || [];
-        folders = d.folders || ["General"];
-        dark    = d.dark    || false;
-        sortMode= d.sortMode|| "manual";
-      }
-    } else {
-      const ln=localStorage.getItem("mn_notes");
-      const lf=localStorage.getItem("mn_folders");
-      const ld=localStorage.getItem("mn_dark");
-      const ls=localStorage.getItem("mn_sort");
-      if(ln) notes=JSON.parse(ln);
-      if(lf) folders=JSON.parse(lf);
-      if(ld) dark=ld==="1";
-      if(ls) sortMode=ls;
-    }
-  } catch(e){ console.warn("Load error:",e); }
-  notes.forEach(migrate);
-  applyDark();
-  sortSel.value=sortMode;
-  renderFolders();
-  render();
+try {
+if(isElectron){
+const raw = await window.electronStorage.get();
+if(raw){
+const d = JSON.parse(raw);
+notes   = d.notes   || [];
+folders = d.folders || ["General"];
+dark    = d.dark    || false;
+sortMode= d.sortMode|| "manual";
+}
+} else {
+const ln=localStorage.getItem("mn_notes");
+const lf=localStorage.getItem("mn_folders");
+const ld=localStorage.getItem("mn_dark");
+const ls=localStorage.getItem("mn_sort");
+if(ln) notes=JSON.parse(ln);
+if(lf) folders=JSON.parse(lf);
+if(ld) dark=ld==="1";
+if(ls) sortMode=ls;
+}
+} catch(e){ console.warn("Load error:",e); }
+notes.forEach(migrate);
+applyDark();
+sortSel.value=sortMode;
+renderFolders();
+render();
 }
 
 function migrate(n){
-  if(!n.folder)n.folder="General";
-  if(!n.items)n.items=[];
-  if(n.checklist===undefined)n.checklist=false;
-  if(n.color===undefined)n.color=null;
+if(!n.folder)n.folder="General";
+if(!n.items)n.items=[];
+if(n.checklist===undefined)n.checklist=false;
+if(n.color===undefined)n.color=null;
+
+delete n.locked; delete n.revealed; delete n.password;
 }
 
 let saveTimer=null;
 function save(){
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{
-    try {
-      if(isElectron){
-        await window.electronStorage.set(JSON.stringify({notes,folders,dark,sortMode}));
-      } else {
-        localStorage.setItem("mn_notes",JSON.stringify(notes));
-        localStorage.setItem("mn_folders",JSON.stringify(folders));
-        localStorage.setItem("mn_dark",dark?"1":"0");
-        localStorage.setItem("mn_sort",sortMode);
-      }
-    } catch(e){ console.warn("Save error:",e); }
-  }, 300);
+clearTimeout(saveTimer);
+saveTimer=setTimeout(async()=>{
+try {
+if(isElectron){
+await window.electronStorage.set(JSON.stringify({notes,folders,dark,sortMode}));
+} else {
+localStorage.setItem("mn_notes",JSON.stringify(notes));
+localStorage.setItem("mn_folders",JSON.stringify(folders));
+localStorage.setItem("mn_dark",dark?"1":"0");
+localStorage.setItem("mn_sort",sortMode);
+}
+} catch(e){ console.warn("Save error:",e); }
+}, 300);
 }
 
 function setSyncState(s){
-  syncDot.className="syncDot"+(s==="syncing"?" syncing":s==="error"?" error":"");
-  syncBanner.className="syncBanner"+(s==="syncing"?" show":"");
+syncDot.className="syncDot"+(s==="syncing"?" syncing":s==="error"?" error":"");
+syncBanner.className="syncBanner"+(s==="syncing"?" show":"");
 }
 
 const sunSVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`;
 const moonSVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
 function applyDark(){
-  document.body.classList.toggle("dark",dark);
-  $("darkIcon").innerHTML=dark?sunSVG:moonSVG;
-  $("darkLabel").textContent=dark?"Light mode":"Dark mode";
+document.body.classList.toggle("dark",dark);
+$("darkIcon").innerHTML=dark?sunSVG:moonSVG;
+$("darkLabel").textContent=dark?"Light mode":"Dark mode";
 }
 darkBtn.onclick=()=>{dark=!dark;applyDark();save();};
 
 sortSel.onchange=()=>{sortMode=sortSel.value;save();render();};
 function sorted(arr){
-  if(sortMode==="newest")return[...arr].sort((a,b)=>b.created-a.created);
-  if(sortMode==="oldest")return[...arr].sort((a,b)=>a.created-b.created);
-  if(sortMode==="alpha")return[...arr].sort((a,b)=>{
-    let ta=(a.subject||(a.checklist?a.items[0]?.text:a.text)||"").toLowerCase();
-    let tb=(b.subject||(b.checklist?b.items[0]?.text:b.text)||"").toLowerCase();
-    return ta<tb?-1:ta>tb?1:0;
-  });
-  return arr;
+if(sortMode==="newest")return[...arr].sort((a,b)=>b.created-a.created);
+if(sortMode==="oldest")return[...arr].sort((a,b)=>a.created-b.created);
+if(sortMode==="alpha")return[...arr].sort((a,b)=>{
+let ta=(a.subject||(a.checklist?a.items[0]?.text:a.text)||"").toLowerCase();
+let tb=(b.subject||(b.checklist?b.items[0]?.text:b.text)||"").toLowerCase();
+return ta<tb?-1:ta>tb?1:0;
+});
+return arr;
 }
 
 function renderFolders(){
-  const list=$("folderList");list.innerHTML="";
-  const allCount=notes.filter(n=>!n.archived).length;
-  const allIcon=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
-  const folderIcon=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
-  function folderItem(label,val,icon,count){
-    const d=document.createElement("div");
-    d.className="folderItem"+(activeFolder===val?" active":"");
-    d.innerHTML=`${icon}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span><span class="folderCount">${count}</span>`;
-    d.onclick=()=>{activeFolder=val;$("topbarTitle").textContent=val==="All"?"All Notes":val;renderFolders();render();closeSidebar();};
-    if(val!=="All"){
-      d.ondblclick=async e=>{
-        e.preventDefault();
-        const act=await dlgPrompt(`Folder "${val}"  —  type new name to rename, or DELETE to remove`,val);
-        if(!act)return;
-        if(act.trim().toUpperCase()==="DELETE"){
-          notes.forEach(n=>{if(n.folder===val)n.folder="General";});
-          folders=folders.filter(f=>f!==val);
-          if(activeFolder===val){activeFolder="All";$("topbarTitle").textContent="All Notes";}
-        } else {
-          const nn=act.trim();
-          notes.forEach(n=>{if(n.folder===val)n.folder=nn;});
-          folders[folders.indexOf(val)]=nn;
-        }
-        save();renderFolders();render();
-      };
-    }
-    return d;
-  }
-  list.appendChild(folderItem("All Notes","All",allIcon,allCount));
-  folders.forEach(f=>{
-    const c=notes.filter(n=>!n.archived&&(n.folder||"General")===f).length;
-    list.appendChild(folderItem(f,f,folderIcon,c));
-  });
+const list=$("folderList");list.innerHTML="";
+const allCount=notes.filter(n=>!n.archived).length;
+const allIcon=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
+const folderIcon=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
+function folderItem(label,val,icon,count){
+const d=document.createElement("div");
+d.className="folderItem"+(activeFolder===val?" active":"");
+d.innerHTML=`${icon}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span><span class="folderCount">${count}</span>`;
+d.onclick=()=>{activeFolder=val;$("topbarTitle").textContent=val==="All"?"All Notes":val;renderFolders();render();closeSidebar();};
+if(val!=="All"){
+d.ondblclick=async e=>{
+e.preventDefault();
+const act=await dlgPrompt(`Folder "${val}"  —  type new name to rename, or DELETE to remove`,val);
+if(!act)return;
+if(act.trim().toUpperCase()==="DELETE"){
+notes.forEach(n=>{if(n.folder===val)n.folder="General";});
+folders=folders.filter(f=>f!==val);
+if(activeFolder===val){activeFolder="All";$("topbarTitle").textContent="All Notes";}
+} else {
+const nn=act.trim();
+notes.forEach(n=>{if(n.folder===val)n.folder=nn;});
+folders[folders.indexOf(val)]=nn;
+}
+save();renderFolders();render();
+};
+}
+return d;
+}
+list.appendChild(folderItem("All Notes","All",allIcon,allCount));
+folders.forEach(f=>{
+const c=notes.filter(n=>!n.archived&&(n.folder||"General")===f).length;
+list.appendChild(folderItem(f,f,folderIcon,c));
+});
 
-  // Mobile folder bar (horizontal scroll tabs under topbar)
-  const mbar=$("mobileFolderBar"); mbar.innerHTML="";
-  ["All",...folders].forEach(f=>{
-    const label=f==="All"?"All":f;
-    const t=document.createElement("button");
-    t.className="mobileFolderTab"+(activeFolder===f?" active":"");
-    t.textContent=label;
-    t.onclick=()=>{activeFolder=f;$("topbarTitle").textContent=f==="All"?"All Notes":f;renderFolders();render();};
-    mbar.appendChild(t);
-  });
+
+const mbar=$("mobileFolderBar"); mbar.innerHTML="";
+["All",...folders].forEach(f=>{
+const label=f==="All"?"All":f;
+const t=document.createElement("button");
+t.className="mobileFolderTab"+(activeFolder===f?" active":"");
+t.textContent=label;
+t.onclick=()=>{activeFolder=f;$("topbarTitle").textContent=f==="All"?"All Notes":f;renderFolders();render();};
+mbar.appendChild(t);
+});
 }
 $("addFolderBtn").onclick=async()=>{
-  const n=await dlgPrompt("New folder name","e.g. Work, Personal...");
-  if(n&&n.trim()&&!folders.includes(n.trim())){folders.push(n.trim());save();renderFolders();}
+const n=await dlgPrompt("New folder name","e.g. Work, Personal...");
+if(n&&n.trim()&&!folders.includes(n.trim())){folders.push(n.trim());save();renderFolders();}
 };
 
 hamburger.onclick=()=>{sidebar.classList.add("open");sideOverlay.classList.add("show");};
@@ -444,215 +184,233 @@ sideOverlay.onclick=closeSidebar;
 function closeSidebar(){sidebar.classList.remove("open");sideOverlay.classList.remove("show");}
 
 function closePopup(){
-  if(curPopup){curPopup.remove();curPopup=null;}
-  document.querySelector(".bd")?.remove();
+if(curPopup){curPopup.remove();curPopup=null;}
+document.querySelector(".bd")?.remove();
 }
 function showPopup(el,anchor){
-  closePopup();
-  const bd=document.createElement("div");bd.className="bd";bd.onclick=closePopup;
-  document.body.appendChild(bd);document.body.appendChild(el);curPopup=el;
-  const r=anchor.getBoundingClientRect();
-  el.style.top=(r.bottom+5)+"px";
-  el.style.left=Math.min(r.left,window.innerWidth-170)+"px";
+closePopup();
+const bd=document.createElement("div");bd.className="bd";bd.onclick=closePopup;
+document.body.appendChild(bd);document.body.appendChild(el);curPopup=el;
+const r=anchor.getBoundingClientRect();
+el.style.top=(r.bottom+5)+"px";
+el.style.left=Math.min(r.left,window.innerWidth-170)+"px";
 }
 
 function redact(t){return(t||"").split("\n").map(l=>"█".repeat(Math.max(6,Math.min(l.length,40)))).join("\n");}
 
 function buildCL(n,editable){
-  const w=document.createElement("div");w.className="checklist";
-  (n.items||[]).forEach(item=>{
-    const row=document.createElement("div");row.className="checkItem";
-    const cb=document.createElement("input");cb.type="checkbox";cb.checked=item.done;
-    if(editable){cb.onchange=e=>{e.stopPropagation();item.done=cb.checked;save();render();};}
-    else cb.disabled=true;
-    const sp=document.createElement("span");sp.textContent=item.text;
-    if(item.done)sp.className="done";
-    row.append(cb,sp);w.appendChild(row);
-  });
-  if(editable&&!n.locked){
-    const ar=document.createElement("div");ar.className="addCLItem";
-    const inp=document.createElement("input");inp.placeholder="Add item...";
-    const plus=document.createElement("button");plus.textContent="+";
-    plus.onclick=e=>{e.stopPropagation();if(inp.value.trim()){n.items.push({text:inp.value.trim(),done:false});inp.value="";save();render();}};
-    inp.onkeydown=e=>{if(e.key==="Enter")plus.click();};
-    ar.append(inp,plus);w.appendChild(ar);
-  }
-  return w;
+const w=document.createElement("div");w.className="checklist";
+(n.items||[]).forEach(item=>{
+const row=document.createElement("div");row.className="checkItem";
+const cb=document.createElement("input");cb.type="checkbox";cb.checked=item.done;
+if(editable){cb.onchange=e=>{e.stopPropagation();item.done=cb.checked;save();render();};}
+else cb.disabled=true;
+const sp=document.createElement("span");sp.textContent=item.text;
+if(item.done)sp.className="done";
+row.append(cb,sp);w.appendChild(row);
+});
+if(editable){
+const ar=document.createElement("div");ar.className="addCLItem";
+const inp=document.createElement("input");inp.placeholder="Add item...";
+const plus=document.createElement("button");plus.textContent="+";
+plus.onclick=e=>{e.stopPropagation();if(inp.value.trim()){n.items.push({text:inp.value.trim(),done:false});inp.value="";save();render();}};
+inp.onkeydown=e=>{if(e.key==="Enter")plus.click();};
+ar.append(inp,plus);w.appendChild(ar);
+}
+return w;
 }
 
 function createNote(n){
-  const div=document.createElement("div");
-  div.className="note"+(n.pinned?" pinned":"");
-  const handle=document.createElement("div");handle.className="dragHandle";
-  handle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="5" r="1.2" fill="currentColor"/><circle cx="15" cy="5" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="19" r="1.2" fill="currentColor"/><circle cx="15" cy="19" r="1.2" fill="currentColor"/></svg>';
-  handle.draggable=true;
-  handle.addEventListener("dragstart",()=>{
-    dragItem=n;div.classList.add("dragging");
-    ph=document.createElement("div");ph.className="placeholder";
-    div.parentNode.insertBefore(ph,div.nextSibling);
-  });
-  handle.addEventListener("dragend",()=>{
-    div.classList.remove("dragging");
-    if(ph){
-      let items=[...ph.parentNode.children].filter(el=>el.classList.contains("note")||el.classList.contains("placeholder"));
-      let ni=items.indexOf(ph),oi=notes.indexOf(dragItem);
-      if(ni>-1&&oi>-1){notes.splice(oi,1);notes.splice(ni,0,dragItem);}
-      ph.remove();ph=null;
-    }
-    save();render();
-  });
-  const dot=document.createElement("div");dot.className="colorDot";
-  dot.style.background=n.color||"transparent";
-  dot.style.border=n.color?"none":"1px dashed var(--border2)";
-  const title=document.createElement("div");title.className="noteTitle";
-  const preview=document.createElement("div");preview.className="notePreview";
-  const full=document.createElement("div");full.className="noteFull";
-  if(n.locked&&!n.revealed){
-    title.textContent="████████";
-    preview.textContent=redact(n.text||"");
-  } else {
-    title.textContent=n.subject||(n.checklist?(n.items||[]).map(i=>i.text).join(", "):(n.text||"").split("\n")[0]);
-    if(n.checklist){preview.appendChild(buildCL(n,false));full.appendChild(buildCL(n,true));}
-    else{preview.textContent=(n.text||"").substring(0,200);full.textContent=n.text||"";}
-  }
-  const meta=document.createElement("div");meta.className="noteMeta";
-  const ds=document.createElement("span");
-  ds.textContent=new Date(n.created).toLocaleDateString()+" • "+new Date(n.created).toLocaleTimeString();
-  meta.appendChild(ds);
-  if(n.folder&&n.folder!=="General"){
-    const fb=document.createElement("span");fb.className="noteFolder";fb.textContent=n.folder;meta.appendChild(fb);
-  }
-  div.addEventListener("click",()=>{if(n.locked&&!n.revealed)return;div.classList.toggle("expanded");});
-  div.addEventListener("dragover",e=>{
-    e.preventDefault();if(!ph)return;
-    const box=div.getBoundingClientRect();
-    if(e.clientY-box.top>box.height/2)div.parentNode.insertBefore(ph,div.nextSibling);
-    else div.parentNode.insertBefore(ph,div);
-  });
-  function btn(icon,fn){
-    const b=document.createElement("button");b.className="nbtn";b.innerHTML=icon;
-    b.onclick=e=>{e.stopPropagation();Promise.resolve(fn(b)).catch(console.error);};return b;
-  }
-  const del=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',()=>{notes.splice(notes.indexOf(n),1);save();render();});
-  const pin=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M5 3l14 14"/><path d="M9 3l6 6-3 3-6-6z"/></svg>',()=>{n.pinned=!n.pinned;save();render();});
-  const arch=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="4"/><path d="M5 8v11h14V8"/></svg>',()=>{n.archived=!n.archived;if(n.archived){lastArchived=n;showToast();}save();render();});
-  const lock=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 118 0v4"/></svg>',async()=>{
-    if(!n.locked){
-      // Not locked yet — set a password
-      const p=await dlgPrompt("Set a password","Choose a password to lock this note","password");
-      if(p&&p.trim()){n.locked=true;n.password=p;n.revealed=false;}
-    } else if(n.revealed){
-      // Unlocked and visible — re-lock without asking password
-      n.revealed=false;
-    } else {
-      // Locked and hidden — ask password to unlock
-      const p=await dlgPrompt("Enter password to unlock","Password","password");
-      if(p===null) return;
-      if(p===n.password){n.revealed=true;}
-      else await dlgAlert("Wrong password","The password you entered is incorrect.");
-    }
-    save();render();
-  });
-  const up=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>',()=>{const i=notes.indexOf(n);if(i>0){[notes[i-1],notes[i]]=[notes[i],notes[i-1]];save();render();}});
-  const down=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',()=>{const i=notes.indexOf(n);if(i<notes.length-1){[notes[i+1],notes[i]]=[notes[i],notes[i+1]];save();render();}});
-  const colorBtn=btn('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>',b=>{
-    const p=document.createElement("div");p.className="colorPicker";
-    COLORS.forEach(c=>{
-      const sw=document.createElement("div");sw.className="colorSwatch"+(n.color===c.v?" sel":"");
-      sw.style.background=c.v||"var(--border)";
-      if(!c.v)sw.style.border="1px dashed var(--text3)";
-      sw.title=c.l;
-      sw.onclick=e=>{e.stopPropagation();n.color=c.v;save();render();closePopup();};
-      p.appendChild(sw);
-    });
-    p.onclick=e=>e.stopPropagation();showPopup(p,b);
-  });
-  const folderBtn=btn('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',b=>{
-    const p=document.createElement("div");p.className="folderPicker";
-    ["General",...folders.filter(f=>f!=="General")].forEach(f=>{
-      const opt=document.createElement("div");opt.className="folderOption";
-      opt.textContent=(n.folder===f?"✓ ":"")+f;
-      opt.onclick=e=>{e.stopPropagation();n.folder=f;save();render();closePopup();};
-      p.appendChild(opt);
-    });
-    p.onclick=e=>e.stopPropagation();showPopup(p,b);
-  });
-  const actions=document.createElement("div");actions.className="noteActions";
-  actions.append(down,up,lock,arch,pin,colorBtn,folderBtn,del);
-  const topRow=document.createElement("div");topRow.className="noteTopRow";
-  topRow.append(handle,actions);
-  const titleRow=document.createElement("div");titleRow.className="noteTitleRow";
-  titleRow.append(dot,title);
-  div.append(topRow,titleRow,preview,full,meta);
-  if(n.color){
-    const bar=document.createElement("div");bar.className="noteColorBar";
-    bar.style.background=n.color+"44";div.appendChild(bar);
-  }
-  return div;
+const div=document.createElement("div");
+div.className="note"+(n.pinned?" pinned":"");
+const handle=document.createElement("div");handle.className="dragHandle";
+handle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="5" r="1.2" fill="currentColor"/><circle cx="15" cy="5" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="19" r="1.2" fill="currentColor"/><circle cx="15" cy="19" r="1.2" fill="currentColor"/></svg>';
+handle.draggable=true;
+handle.addEventListener("dragstart",()=>{
+dragItem=n;div.classList.add("dragging");
+ph=document.createElement("div");ph.className="placeholder";
+div.parentNode.insertBefore(ph,div.nextSibling);
+});
+handle.addEventListener("dragend",()=>{
+div.classList.remove("dragging");
+if(ph){
+let items=[...ph.parentNode.children].filter(el=>el.classList.contains("note")||el.classList.contains("placeholder"));
+let ni=items.indexOf(ph),oi=notes.indexOf(dragItem);
+if(ni>-1&&oi>-1){notes.splice(oi,1);notes.splice(ni,0,dragItem);}
+ph.remove();ph=null;
+}
+save();render();
+});
+const dot=document.createElement("div");dot.className="colorDot";
+dot.style.background=n.color||"transparent";
+dot.style.border=n.color?"none":"1px dashed var(--border2)";
+const title=document.createElement("div");title.className="noteTitle";
+const preview=document.createElement("div");preview.className="notePreview";
+const full=document.createElement("div");full.className="noteFull";
+title.textContent=n.subject||(n.checklist?(n.items||[]).map(i=>i.text).join(", "):(n.text||"").split("\n")[0]);
+if(n.checklist){preview.appendChild(buildCL(n,false));full.appendChild(buildCL(n,true));}
+else{preview.textContent=(n.text||"").substring(0,200);full.textContent=n.text||"";}
+const meta=document.createElement("div");meta.className="noteMeta";
+const ds=document.createElement("span");
+ds.textContent=new Date(n.created).toLocaleDateString()+" • "+new Date(n.created).toLocaleTimeString();
+meta.appendChild(ds);
+if(n.folder&&n.folder!=="General"){
+const fb=document.createElement("span");fb.className="noteFolder";fb.textContent=n.folder;meta.appendChild(fb);
+}
+div.addEventListener("click",()=>{if(n.editing)return;div.classList.toggle("expanded");});
+div.addEventListener("dragover",e=>{
+e.preventDefault();if(!ph)return;
+const box=div.getBoundingClientRect();
+if(e.clientY-box.top>box.height/2)div.parentNode.insertBefore(ph,div.nextSibling);
+else div.parentNode.insertBefore(ph,div);
+});
+function btn(icon,fn){
+const b=document.createElement("button");b.className="nbtn";b.innerHTML=icon;
+b.onclick=e=>{e.stopPropagation();Promise.resolve(fn(b)).catch(console.error);};return b;
+}
+const del=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',()=>{notes.splice(notes.indexOf(n),1);save();render();});
+const pin=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M5 3l14 14"/><path d="M9 3l6 6-3 3-6-6z"/></svg>',()=>{n.pinned=!n.pinned;save();render();});
+const arch=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="4"/><path d="M5 8v11h14V8"/></svg>',()=>{n.archived=!n.archived;if(n.archived){lastArchived=n;showToast();}save();render();});
+const editBtn=btn('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',()=>{
+
+n.editing = !n.editing;
+if(n.editing){
+div.classList.add("expanded");
+
+full.innerHTML="";
+if(n.checklist){
+full.appendChild(buildCL(n,true));
+} else {
+const ta=document.createElement("textarea");
+ta.value=n.text||"";
+ta.style.cssText="width:100%;border:1px solid var(--border2);border-radius:8px;padding:8px;font-size:13px;line-height:1.55;background:var(--bg);color:var(--text);resize:vertical;min-height:80px;outline:none;font-family:inherit";
+ta.onclick=e=>e.stopPropagation();
+ta.oninput=()=>{n.text=ta.value;};
+full.appendChild(ta);
+setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);},30);
+}
+
+const titleInput=document.createElement("input");
+titleInput.value=n.subject||"";
+titleInput.placeholder="Title (optional)";
+titleInput.style.cssText="width:100%;border:1px solid var(--border2);border-radius:8px;padding:6px 8px;font-size:14px;font-weight:600;background:var(--bg);color:var(--text);outline:none;margin-bottom:6px;font-family:inherit";
+titleInput.onclick=e=>e.stopPropagation();
+titleInput.oninput=()=>{n.subject=titleInput.value;};
+full.prepend(titleInput);
+
+const saveRow=document.createElement("div");saveRow.style.cssText="display:flex;gap:6px;margin-top:8px";
+const saveBtn=document.createElement("button");
+saveBtn.textContent="Save";
+saveBtn.style.cssText="flex:1;padding:8px;border-radius:9px;border:none;background:var(--text);color:var(--bg);font-size:13px;font-weight:500;cursor:pointer";
+saveBtn.onclick=e=>{e.stopPropagation();n.editing=false;save();render();};
+saveRow.appendChild(saveBtn);
+full.appendChild(saveRow);
+editBtn.style.background="var(--text)";
+editBtn.style.color="var(--bg)";
+} else {
+save();render();
+}
+});
+const up=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>',()=>{const i=notes.indexOf(n);if(i>0){[notes[i-1],notes[i]]=[notes[i],notes[i-1]];save();render();}});
+const down=btn('<svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',()=>{const i=notes.indexOf(n);if(i<notes.length-1){[notes[i+1],notes[i]]=[notes[i],notes[i+1]];save();render();}});
+const colorBtn=btn('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>',b=>{
+const p=document.createElement("div");p.className="colorPicker";
+COLORS.forEach(c=>{
+const sw=document.createElement("div");sw.className="colorSwatch"+(n.color===c.v?" sel":"");
+sw.style.background=c.v||"var(--border)";
+if(!c.v)sw.style.border="1px dashed var(--text3)";
+sw.title=c.l;
+sw.onclick=e=>{e.stopPropagation();n.color=c.v;save();render();closePopup();};
+p.appendChild(sw);
+});
+p.onclick=e=>e.stopPropagation();showPopup(p,b);
+});
+const folderBtn=btn('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',b=>{
+const p=document.createElement("div");p.className="folderPicker";
+["General",...folders.filter(f=>f!=="General")].forEach(f=>{
+const opt=document.createElement("div");opt.className="folderOption";
+opt.textContent=(n.folder===f?"✓ ":"")+f;
+opt.onclick=e=>{e.stopPropagation();n.folder=f;save();render();closePopup();};
+p.appendChild(opt);
+});
+p.onclick=e=>e.stopPropagation();showPopup(p,b);
+});
+const actions=document.createElement("div");actions.className="noteActions";
+actions.append(down,up,editBtn,arch,pin,colorBtn,folderBtn,del);
+const topRow=document.createElement("div");topRow.className="noteTopRow";
+topRow.append(handle,actions);
+const titleRow=document.createElement("div");titleRow.className="noteTitleRow";
+titleRow.append(dot,title);
+div.append(topRow,titleRow,preview,full,meta);
+if(n.color){
+const bar=document.createElement("div");bar.className="noteColorBar";
+bar.style.background=n.color+"44";div.appendChild(bar);
+}
+return div;
 }
 
 function render(){
-  const q=(searchEl.value||"").toLowerCase();
-  pinnedBox.innerHTML="";notesBox.innerHTML="";archivedBox.innerHTML="";
-  function matches(n){
-    return(n.text||"").toLowerCase().includes(q)
-      ||(n.subject||"").toLowerCase().includes(q)
-      ||(n.items||[]).some(i=>i.text.toLowerCase().includes(q));
-  }
-  function inFolder(n){return activeFolder==="All"||(n.folder||"General")===activeFolder;}
-  const pinned=sorted(notes.filter(n=>n.pinned&&!n.archived&&matches(n)&&inFolder(n)));
-  const normal=sorted(notes.filter(n=>!n.pinned&&!n.archived&&matches(n)&&inFolder(n)));
-  const archived=sorted(notes.filter(n=>n.archived&&matches(n)));
-  $("pinnedLabel").style.display=pinned.length?"":"none";
-  pinned.forEach(x=>pinnedBox.appendChild(createNote(x)));
-  if(!normal.length&&!pinned.length&&!q){
-    const e=document.createElement("div");e.className="emptyState";
-    e.innerHTML=`<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No notes yet. Write something!</p>`;
-    notesBox.appendChild(e);
-  } else {
-    normal.forEach(x=>notesBox.appendChild(createNote(x)));
-  }
-  archived.forEach(n=>{
-    const card=document.createElement("div");card.className="archivedCard";
-    if(n.color)card.style.borderColor=n.color;
-    card.textContent=n.locked&&!n.revealed?"████":(n.subject||(n.text||"").substring(0,14));
-    card.onclick=()=>{n.archived=false;save();render();};
-    archivedBox.appendChild(card);
-  });
-  renderFolders();
+const q=(searchEl.value||"").toLowerCase();
+pinnedBox.innerHTML="";notesBox.innerHTML="";archivedBox.innerHTML="";
+function matches(n){
+return(n.text||"").toLowerCase().includes(q)
+||(n.subject||"").toLowerCase().includes(q)
+||(n.items||[]).some(i=>i.text.toLowerCase().includes(q));
+}
+function inFolder(n){return activeFolder==="All"||(n.folder||"General")===activeFolder;}
+const pinned=sorted(notes.filter(n=>n.pinned&&!n.archived&&matches(n)&&inFolder(n)));
+const normal=sorted(notes.filter(n=>!n.pinned&&!n.archived&&matches(n)&&inFolder(n)));
+const archived=sorted(notes.filter(n=>n.archived&&matches(n)));
+$("pinnedLabel").style.display=pinned.length?"":"none";
+pinned.forEach(x=>pinnedBox.appendChild(createNote(x)));
+if(!normal.length&&!pinned.length&&!q){
+const e=document.createElement("div");e.className="emptyState";
+e.innerHTML=`<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No notes yet. Write something!</p>`;
+notesBox.appendChild(e);
+} else {
+normal.forEach(x=>notesBox.appendChild(createNote(x)));
+}
+archived.forEach(n=>{
+const card=document.createElement("div");card.className="archivedCard";
+if(n.color)card.style.borderColor=n.color;
+card.textContent=(n.subject||(n.text||"").substring(0,14));
+card.onclick=()=>{n.archived=false;save();render();};
+archivedBox.appendChild(card);
+});
+renderFolders();
 }
 
 function addClRow(val=""){
-  const row=document.createElement("div");row.className="clRow";
-  const inp=document.createElement("input");inp.type="text";inp.placeholder="Item...";inp.value=val;
-  inp.onkeydown=e=>{if(e.key==="Enter")addClRow();};
-  const rm=document.createElement("button");rm.className="rmBtn";rm.textContent="×";
-  rm.onclick=()=>{if(clInputs.children.length>1)row.remove();};
-  row.append(inp,rm);clInputs.appendChild(row);
-  setTimeout(()=>inp.focus(),10);
+const row=document.createElement("div");row.className="clRow";
+const inp=document.createElement("input");inp.type="text";inp.placeholder="Item...";inp.value=val;
+inp.onkeydown=e=>{if(e.key==="Enter")addClRow();};
+const rm=document.createElement("button");rm.className="rmBtn";rm.textContent="×";
+rm.onclick=()=>{if(clInputs.children.length>1)row.remove();};
+row.append(inp,rm);clInputs.appendChild(row);
+setTimeout(()=>inp.focus(),10);
 }
 modeBtn.onclick=()=>{
-  clMode=!clMode;modeBtn.classList.toggle("on",clMode);
-  textRow.style.display=clMode?"none":"flex";
-  checkRow.style.display=clMode?"flex":"none";
-  checkRow.style.flexDirection="column";
-  if(clMode&&clInputs.children.length===0)addClRow();
+clMode=!clMode;modeBtn.classList.toggle("on",clMode);
+textRow.style.display=clMode?"none":"flex";
+checkRow.style.display=clMode?"flex":"none";
+checkRow.style.flexDirection="column";
+if(clMode&&clInputs.children.length===0)addClRow();
 };
 addClItemBtn.onclick=()=>addClRow();
 
 function addNote(){
-  const folder=activeFolder==="All"?"General":activeFolder;
-  if(clMode){
-    const items=[...clInputs.querySelectorAll("input[type=text]")].map(i=>i.value.trim()).filter(Boolean);
-    if(!items.length)return;
-    notes.unshift({subject:subjectEl.value.trim(),checklist:true,items:items.map(t=>({text:t,done:false})),pinned:false,archived:false,locked:false,revealed:false,password:null,color:null,folder,created:Date.now()});
-    clInputs.innerHTML="";addClRow();
-  } else {
-    const text=inputEl.value.trim();if(!text)return;
-    notes.unshift({subject:subjectEl.value.trim(),text,checklist:false,items:[],pinned:false,archived:false,locked:false,revealed:false,password:null,color:null,folder,created:Date.now()});
-    inputEl.value="";
-  }
-  subjectEl.value="";save();render();
+const folder=activeFolder==="All"?"General":activeFolder;
+if(clMode){
+const items=[...clInputs.querySelectorAll("input[type=text]")].map(i=>i.value.trim()).filter(Boolean);
+if(!items.length)return;
+notes.unshift({subject:subjectEl.value.trim(),checklist:true,items:items.map(t=>({text:t,done:false})),pinned:false,archived:false,color:null,folder,created:Date.now()});
+clInputs.innerHTML="";addClRow();
+} else {
+const text=inputEl.value.trim();if(!text)return;
+notes.unshift({subject:subjectEl.value.trim(),text,checklist:false,items:[],pinned:false,archived:false,color:null,folder,created:Date.now()});
+inputEl.value="";
+}
+subjectEl.value="";save();render();
 }
 addBtn.onclick=addNote;
 addClNoteBtn.onclick=addNote;
@@ -661,31 +419,31 @@ searchEl.oninput=render;
 undoEl.onclick=()=>{if(lastArchived){lastArchived.archived=false;save();render();hideToast();}};
 function showToast(){toastEl.classList.add("show");setTimeout(hideToast,4000);}
 function hideToast(){toastEl.classList.remove("show");}
-// ── Custom dialog (replaces prompt/confirm/alert — blocked in Electron) ────────
+
 const dlgOverlay=$("dialogOverlay"),dlgTitle=$("dialogTitle"),dlgMsg=$("dialogMsg"),dlgInput=$("dialogInput"),dlgBtns=$("dialogBtns");
 function showDialog({title,msg,input,inputType="text",placeholder="",buttons}){
-  return new Promise(res=>{
-    dlgTitle.textContent=title;
-    if(msg){dlgMsg.textContent=msg;dlgMsg.style.display="";}else dlgMsg.style.display="none";
-    if(input!==undefined){
-      dlgInput.style.display="";dlgInput.type=inputType;
-      dlgInput.placeholder=placeholder;dlgInput.value=input;
-      setTimeout(()=>{dlgInput.focus();dlgInput.select();},50);
-    } else dlgInput.style.display="none";
-    dlgBtns.innerHTML="";
-    buttons.forEach(b=>{
-      const btn=document.createElement("button");
-      btn.className="dialogBtn"+(b.primary?" primary":"")+(b.danger?" danger":"");
-      btn.textContent=b.label;
-      btn.onclick=()=>{dlgOverlay.classList.remove("show");res(b.value!==undefined?b.value:dlgInput.value);};
-      dlgBtns.appendChild(btn);
-    });
-    dlgInput.onkeydown=e=>{
-      if(e.key==="Enter"){dlgBtns.querySelector(".primary")?.click();}
-      if(e.key==="Escape"){dlgOverlay.classList.remove("show");res(null);}
-    };
-    dlgOverlay.classList.add("show");
-  });
+return new Promise(res=>{
+dlgTitle.textContent=title;
+if(msg){dlgMsg.textContent=msg;dlgMsg.style.display="";}else dlgMsg.style.display="none";
+if(input!==undefined){
+dlgInput.style.display="";dlgInput.type=inputType;
+dlgInput.placeholder=placeholder;dlgInput.value=input;
+setTimeout(()=>{dlgInput.focus();dlgInput.select();},50);
+} else dlgInput.style.display="none";
+dlgBtns.innerHTML="";
+buttons.forEach(b=>{
+const btn=document.createElement("button");
+btn.className="dialogBtn"+(b.primary?" primary":"")+(b.danger?" danger":"");
+btn.textContent=b.label;
+btn.onclick=()=>{dlgOverlay.classList.remove("show");res(b.value!==undefined?b.value:dlgInput.value);};
+dlgBtns.appendChild(btn);
+});
+dlgInput.onkeydown=e=>{
+if(e.key==="Enter"){dlgBtns.querySelector(".primary")?.click();}
+if(e.key==="Escape"){dlgOverlay.classList.remove("show");res(null);}
+};
+dlgOverlay.classList.add("show");
+});
 }
 function dlgAlert(title,msg){return showDialog({title,msg,buttons:[{label:"OK",primary:true,value:true}]});}
 function dlgConfirm(title,msg){return showDialog({title,msg,buttons:[{label:"Cancel",value:false},{label:"OK",primary:true,value:true}]});}
@@ -700,130 +458,126 @@ $("syncBtn").onclick = () => { syncModal.classList.add("show"); exportCode.value
 $("closeModalBtn").onclick = () => syncModal.classList.remove("show");
 syncModal.addEventListener("click", e => { if(e.target===syncModal) syncModal.classList.remove("show"); });
 
-// ── File export ───────────────────────────────────────────────────────────────
 $("exportFileBtn").onclick = () => {
-  const payload = { notes, folders, dark, sortMode, exported: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `notes-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showSyncToast(`✓ Downloaded ${notes.length} notes`);
+const payload = { notes, folders, dark, sortMode, exported: new Date().toISOString() };
+const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+a.download = `notes-backup-${new Date().toISOString().slice(0,10)}.json`;
+a.click();
+URL.revokeObjectURL(url);
+showSyncToast(`✓ Downloaded ${notes.length} notes`);
 };
 
-// ── File import ───────────────────────────────────────────────────────────────
 function pickFile(){ return new Promise(res => {
-  const inp = $("importFileInput");
-  inp.value = "";
-  inp.onchange = e => {
-    const file = e.target.files[0];
-    if(!file) return res(null);
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try { res(JSON.parse(ev.target.result)); }
-      catch(e) { res(null); }
-    };
-    reader.readAsText(file);
-  };
-  inp.click();
+const inp = $("importFileInput");
+inp.value = "";
+inp.onchange = e => {
+const file = e.target.files[0];
+if(!file) return res(null);
+const reader = new FileReader();
+reader.onload = ev => {
+try { res(JSON.parse(ev.target.result)); }
+catch(e) { res(null); }
+};
+reader.readAsText(file);
+};
+inp.click();
 });}
 
 $("importFileReplaceBtn").onclick = async () => {
-  const data = await pickFile();
-  if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
-  const ok = await dlgConfirm("Replace all notes?", `Replace all your notes with ${data.notes.length} imported notes? This cannot be undone.`);
-  if(!ok) return;
-  notes = data.notes; folders = data.folders||["General"];
-  notes.forEach(migrate);
-  save(); renderFolders(); render();
-  syncModal.classList.remove("show");
-  showSyncToast(`✓ Imported ${notes.length} notes`);
+const data = await pickFile();
+if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
+const ok = await dlgConfirm("Replace all notes?", `Replace all your notes with ${data.notes.length} imported notes? This cannot be undone.`);
+if(!ok) return;
+notes = data.notes; folders = data.folders||["General"];
+notes.forEach(migrate);
+save(); renderFolders(); render();
+syncModal.classList.remove("show");
+showSyncToast(`✓ Imported ${notes.length} notes`);
 };
 
 $("importFileMergeBtn").onclick = async () => {
-  const data = await pickFile();
-  if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
-  const existing = new Set(notes.map(n=>n.created));
-  const newNotes = data.notes.filter(n=>!existing.has(n.created));
-  data.folders?.forEach(f=>{ if(!folders.includes(f)) folders.push(f); });
-  notes = [...newNotes, ...notes];
-  notes.forEach(migrate);
-  save(); renderFolders(); render();
-  syncModal.classList.remove("show");
-  showSyncToast(`✓ Merged ${newNotes.length} new notes`);
+const data = await pickFile();
+if(!data||!Array.isArray(data.notes)){ await dlgAlert("Invalid file","Please select a valid notes backup .json file."); return; }
+const existing = new Set(notes.map(n=>n.created));
+const newNotes = data.notes.filter(n=>!existing.has(n.created));
+data.folders?.forEach(f=>{ if(!folders.includes(f)) folders.push(f); });
+notes = [...newNotes, ...notes];
+notes.forEach(migrate);
+save(); renderFolders(); render();
+syncModal.classList.remove("show");
+showSyncToast(`✓ Merged ${newNotes.length} new notes`);
 };
 
-// ── Code export/import (fallback for small sets) ──────────────────────────────
 $("genCodeBtn").onclick = () => {
-  const payload = { notes, folders, dark, sortMode, exported: Date.now() };
-  const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  exportCode.value = code;
-  exportCode.select();
+const payload = { notes, folders, dark, sortMode, exported: Date.now() };
+const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+exportCode.value = code;
+exportCode.select();
 };
 
 $("copyCodeBtn").onclick = () => {
-  if(!exportCode.value){ $("genCodeBtn").click(); }
-  setTimeout(() => {
-    navigator.clipboard.writeText(exportCode.value).then(() => {
-      $("copyCodeBtn").textContent = "Copied ✓";
-      setTimeout(() => $("copyCodeBtn").textContent = "Copy code", 2000);
-    }).catch(() => {
-      exportCode.select();
-      document.execCommand("copy");
-      $("copyCodeBtn").textContent = "Copied ✓";
-      setTimeout(() => $("copyCodeBtn").textContent = "Copy code", 2000);
-    });
-  }, 50);
+if(!exportCode.value){ $("genCodeBtn").click(); }
+setTimeout(() => {
+navigator.clipboard.writeText(exportCode.value).then(() => {
+$("copyCodeBtn").textContent = "Copied ✓";
+setTimeout(() => $("copyCodeBtn").textContent = "Copy code", 2000);
+}).catch(() => {
+exportCode.select();
+document.execCommand("copy");
+$("copyCodeBtn").textContent = "Copied ✓";
+setTimeout(() => $("copyCodeBtn").textContent = "Copy code", 2000);
+});
+}, 50);
 };
 
 async function decodeImport(){
-  const raw = importCode.value.trim();
-  if(!raw){ await dlgAlert("No code","Please paste an export code first."); return null; }
-  try {
-    const json = decodeURIComponent(escape(atob(raw)));
-    const data = JSON.parse(json);
-    if(!Array.isArray(data.notes)) throw new Error("Invalid");
-    return data;
-  } catch(e) {
-    await dlgAlert("Invalid code","Make sure you copied the full export code.");
-    return null;
-  }
+const raw = importCode.value.trim();
+if(!raw){ await dlgAlert("No code","Please paste an export code first."); return null; }
+try {
+const json = decodeURIComponent(escape(atob(raw)));
+const data = JSON.parse(json);
+if(!Array.isArray(data.notes)) throw new Error("Invalid");
+return data;
+} catch(e) {
+await dlgAlert("Invalid code","Make sure you copied the full export code.");
+return null;
+}
 }
 
 $("importReplaceBtn").onclick = async() => {
-  const data = await decodeImport(); if(!data) return;
-  const ok = await dlgConfirm("Replace all notes?",`This will replace all your current notes with ${data.notes.length} imported notes. This cannot be undone.`);
-  if(!ok) return;
-  notes = data.notes; folders = data.folders||["General"];
-  notes.forEach(migrate);
-  save(); renderFolders(); render();
-  syncModal.classList.remove("show");
-  showSyncToast(`✓ Imported ${notes.length} notes`);
+const data = await decodeImport(); if(!data) return;
+const ok = await dlgConfirm("Replace all notes?",`This will replace all your current notes with ${data.notes.length} imported notes. This cannot be undone.`);
+if(!ok) return;
+notes = data.notes; folders = data.folders||["General"];
+notes.forEach(migrate);
+save(); renderFolders(); render();
+syncModal.classList.remove("show");
+showSyncToast(`✓ Imported ${notes.length} notes`);
 };
 
 $("importMergeBtn").onclick = async() => {
-  const data = await decodeImport(); if(!data) return;
-  const existing = new Set(notes.map(n=>n.created));
-  const newNotes = data.notes.filter(n=>!existing.has(n.created));
-  data.folders?.forEach(f=>{ if(!folders.includes(f)) folders.push(f); });
-  notes = [...newNotes, ...notes];
-  notes.forEach(migrate);
-  save(); renderFolders(); render();
-  syncModal.classList.remove("show");
-  showSyncToast(`✓ Merged ${newNotes.length} new notes`);
+const data = await decodeImport(); if(!data) return;
+const existing = new Set(notes.map(n=>n.created));
+const newNotes = data.notes.filter(n=>!existing.has(n.created));
+data.folders?.forEach(f=>{ if(!folders.includes(f)) folders.push(f); });
+notes = [...newNotes, ...notes];
+notes.forEach(migrate);
+save(); renderFolders(); render();
+syncModal.classList.remove("show");
+showSyncToast(`✓ Merged ${newNotes.length} new notes`);
 };
 
 function showSyncToast(msg){
-  const t=document.createElement("div");
-  t.style.cssText=`position:fixed;top:16px;right:16px;background:var(--text);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:12px;z-index:600;transition:opacity .4s;pointer-events:none`;
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity="0";setTimeout(()=>t.remove(),400);},3000);
+const t=document.createElement("div");
+t.style.cssText=`position:fixed;top:16px;right:16px;background:var(--text);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:12px;z-index:600;transition:opacity .4s;pointer-events:none`;
+t.textContent=msg;
+document.body.appendChild(t);
+setTimeout(()=>{t.style.opacity="0";setTimeout(()=>t.remove(),400);},3000);
 }
 
-loadFromStorage();
-</script>
+loadFromStorage();</script>
 </body>
 </html>
